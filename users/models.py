@@ -17,8 +17,8 @@ class User(AbstractUser):
     first_name = models.CharField('Имя', blank=True, max_length=255)
     last_name = models.CharField('Фамилия', blank=True, max_length=255)
     patronymic = models.CharField('Отчество', blank=True, max_length=255)
-    email = models.EmailField('Почта', unique=True, null=True, blank=True)
-    phone = models.CharField('номер телефона', max_length=15, unique=True, null=True, blank=True)
+    email = models.EmailField('Почта', null=True, blank=True)
+    phone = models.CharField('номер телефона', max_length=15, null=True, blank=True)
     avatar = models.ImageField('аватарка', upload_to='avatars/', null=True, blank=True)
     city = models.ForeignKey(to='users.City', on_delete=models.SET_NULL, null=True, blank=True)
     bio = models.TextField('Информация', max_length=500, blank=True)
@@ -41,3 +41,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
+        constraints = [
+            models.UniqueConstraint('phone', condition=models.Q(phone__isnull=False), name='user_phone_unique_if_filled'),
+            models.UniqueConstraint('email', condition=models.Q(email__isnull=False), name='user_email_unique_if_filled'),
+        ]

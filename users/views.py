@@ -20,5 +20,4 @@ class UserRetrieveAPIView(APIView):
     def get(self, request):
         user = request.user
         serializer = self.output_serializer(instance=user)
-        serializer.is_valid(raise_exception=True)
-        return Response(data=serializer.validated_data, status=status.HTTP_200_OK)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)

@@ -1,5 +1,6 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
@@ -24,12 +25,18 @@ class RegisterView(APIView):
         serializer = self.input_serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
+        email = validated_data['email']
+        phone = validated_data['phone']
+        if email and User.objects.filter(email__isnull=False, email=email).exists():
+            raise ValidationError({'detail': 'Email already registered'})
+        if phone and User.objects.filter(phone__isnull=False, phone=phone).exists():
+            raise ValidationError({'detail': 'Phone already registered'})
+
         user = User.objects.create_user(
             username=validated_data['username'],
-            email=validated_data['email'],
+            email=email,
             password=validated_data['password'],
-            phone=validated_data['phone'],
-            city=validated_data['city'],
+            phone=phone,
         )
 
         refresh = RefreshToken.for_user(user)
