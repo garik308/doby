@@ -1,3 +1,5 @@
 from django.contrib import admin
 
-# Register your models here.
+from sitters.models import SitterProfile
+
+admin.site.register(SitterProfile)

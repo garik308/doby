@@ -1,13 +1,21 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
+from utils.mixins import AutoDateMixin
 
-class SitterProfile(models.Model):
+
+class SitterProfile(AutoDateMixin):
     """Model: Ситтер
 
     Данные о пользователе, который готов посидеть с вашей собакой
     """
 
-    experience_years = models.IntegerField('', null=True, blank=True)
+    experience_years = models.IntegerField(
+        'Количество лет опыта',
+        blank=True,
+        default=0,
+        validators=[MinValueValidator(0)],
+    )
     price_per_hour = models.DecimalField(
         'Стоимость в час',
         max_digits=6,
@@ -16,6 +24,12 @@ class SitterProfile(models.Model):
         blank=True
     )
     is_verified = models.BooleanField('Подтвержден', default=False)
+    bio = models.CharField('Описание ситтера', blank=True, max_length=1500)
 
     def __str__(self):
-        return f"Sitter profile for user {self.user_id}"
+        return f"Sitter profile {self.id}"
+
+    class Meta:
+        verbose_name = 'Профиль ситтера'
+        verbose_name_plural = 'Профили ситтеров'
+        indexes = [models.Index(fields=['dt_updated'], name='sitter_profile_dt_updated_idx')]

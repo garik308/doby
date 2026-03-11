@@ -21,7 +21,7 @@ class User(AbstractUser):
     phone = models.CharField('номер телефона', max_length=15, null=True, blank=True)
     avatar = models.ImageField('аватарка', upload_to='avatars/', null=True, blank=True)
     city = models.ForeignKey(to='users.City', on_delete=models.SET_NULL, null=True, blank=True)
-    bio = models.TextField('Информация', max_length=500, blank=True)
+    bio = models.TextField('Информация', max_length=1500, blank=True)
     sitter_profile = models.OneToOneField(
         to='sitters.SitterProfile',
         on_delete=models.SET_NULL,

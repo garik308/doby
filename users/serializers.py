@@ -13,16 +13,18 @@ class SitterProfileSerializer(serializers.Serializer):
 
 
 class CitySerializer(serializers.Serializer):
-    name = serializers.CharField(read_only=True)
-    translit = serializers.CharField(read_only=True)
+    name = serializers.CharField(label='Имя')
+    translit = serializers.CharField(label='Транслит')
 
 
 class UserSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
+    first_name = serializers.CharField(label='Имя', max_length=255)
+    last_name = serializers.CharField(label='Фамилия', max_length=255)
+    patronymic = serializers.CharField(label='Отчество', max_length=255)
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField()
     avatar = serializers.ImageField(allow_null=True)
     phone = serializers.CharField(max_length=15)
-    city = CitySerializer(label='Город', )
+    city = CitySerializer(label='Город')
     bio = serializers.CharField(max_length=500, allow_blank=True)
-    sitter_profile = SitterProfileSerializer(read_only=True)

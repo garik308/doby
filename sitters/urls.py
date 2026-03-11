@@ -1,7 +1,7 @@
 from django.urls import path
 
-from sitters.views import SittersAPIView
+from sitters.views import SittersPaginatedAPIView
 
 urlpatterns = [
-    path('', SittersAPIView.as_view(), name='paginated_sitters'),
+    path('', SittersPaginatedAPIView.as_view(), name='paginated_sitters'),
 ]

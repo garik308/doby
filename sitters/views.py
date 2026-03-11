@@ -1,10 +1,19 @@
-from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from sitters.paginators import SittersPagination
+from sitters.models import SitterProfile
+from sitters.serializers import SittersPaginatedSerialzer
 
-class SittersAPIView(APIView):
-    # input_serializer_class = SittersPaginatedSerialzer
-    # query_serializer_class = SittersQueryParametersSerializer
+
+class SittersPaginatedAPIView(APIView):
+    """Возвра"""
+
+    input_serializer_class = SittersPaginatedSerialzer
+
     def get(self, request):
-        return Response(status=status.HTTP_200_OK)
+        """Получить данные ситтеров с пагинацией"""
+        queryset = SitterProfile.objects.select_related('user')
+        paginator = SittersPagination()
+        page = paginator.paginate_queryset(queryset, request, view=self)
+        serializer = self.input_serializer_class(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
