@@ -13,6 +13,7 @@ class SitterProfileSerializer(serializers.Serializer):
 
 
 class CitySerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(label='Имя')
     translit = serializers.CharField(label='Транслит')
 

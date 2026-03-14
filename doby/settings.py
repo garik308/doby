@@ -19,6 +19,7 @@ class Env:
     @staticmethod
     def get_bool(variable_name, default=False):
         variable = os.environ.get(variable_name, None)
+        print(variable)
         if variable is None:
             return default
         return variable.lower() == 'true'
@@ -37,7 +38,7 @@ class Env:
 SECRET_KEY = Env.get_str('DJANGO_SECRET_KEY', 'django-insecure-default-dev-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = Env.get_bool('DEBUG', False)
+DEBUG = True or Env.get_bool('DEBUG', False)
 
 ALLOWED_HOSTS = []
 if DEBUG:
@@ -58,6 +59,8 @@ INSTALLED_APPS = [
     'channels',
     'authentication',
     'chats',
+    'bookings',
+    'pets',
     'rest_framework_simplejwt',
     'drf_spectacular',
     'drf_spectacular_sidecar',

@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from authentication.serializers import RegisterSerializer, OutputRegisterSerializer
-from users.models import User
+from users.models import User, City
 from users.serializers import UserSerializer
 
 
@@ -25,18 +25,19 @@ class RegisterView(APIView):
         serializer = self.input_serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
-        email = validated_data['email']
-        phone = validated_data['phone']
+        city_translit = validated_data.pop('city_translit')
+        email = validated_data.pop('email')
+        phone = validated_data.pop('phone')
         if email and User.objects.filter(email__isnull=False, email=email).exists():
             raise ValidationError({'detail': 'Email already registered'})
         if phone and User.objects.filter(phone__isnull=False, phone=phone).exists():
             raise ValidationError({'detail': 'Phone already registered'})
 
         user = User.objects.create_user(
-            username=validated_data['username'],
             email=email,
-            password=validated_data['password'],
             phone=phone,
+            city=City.objects.get(translit=city_translit),
+            **validated_data,
         )
 
         refresh = RefreshToken.for_user(user)
