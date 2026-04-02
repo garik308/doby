@@ -12,4 +12,6 @@ class ChatRoomDetailView(generics.RetrieveAPIView):
     def get_queryset(self):
         # Пользователь может видеть только свои чаты
         user = self.request.user
-        return ChatRoom.objects.filter(participants=user)
+        return ChatRoom.objects.filter(
+            id__in=ChatRoom.participants.through.objects.filter(user=user).values_list('chatroom_id', flat=True),
+        )
