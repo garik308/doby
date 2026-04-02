@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -14,10 +16,10 @@ class City(models.Model):
 class User(AbstractUser):
     """Model: Пользователь"""
 
+    uuid = models.UUIDField('UUID', default=uuid.uuid4, unique=True)
     first_name = models.CharField('Имя', blank=True, max_length=255)
     last_name = models.CharField('Фамилия', blank=True, max_length=255)
     patronymic = models.CharField('Отчество', blank=True, max_length=255)
-    email = models.EmailField('Почта', null=True, blank=True)
     phone = models.CharField('номер телефона', max_length=15, null=True, blank=True)
     avatar = models.ImageField('аватарка', upload_to='avatars/', null=True, blank=True)
     city = models.ForeignKey(to='users.City', on_delete=models.SET_NULL, null=True, blank=True)
@@ -42,6 +44,9 @@ class User(AbstractUser):
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
         constraints = [
-            models.UniqueConstraint('phone', condition=models.Q(phone__isnull=False), name='user_phone_unique_if_filled'),
-            models.UniqueConstraint('email', condition=models.Q(email__isnull=False), name='user_email_unique_if_filled'),
+            models.UniqueConstraint(
+                'phone',
+                condition=models.Q(phone__isnull=False),
+                name='user_phone_unique_if_filled',
+            ),
         ]

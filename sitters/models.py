@@ -1,3 +1,5 @@
+import uuid
+
 from django.core.validators import MinValueValidator
 from django.db import models
 
@@ -10,6 +12,7 @@ class SitterProfile(AutoDateMixin):
     Данные о пользователе, который готов посидеть с вашей собакой
     """
 
+    uuid = models.UUIDField('UUID', default=uuid.uuid4, unique=True, primary_key=True)
     experience_years = models.IntegerField(
         'Количество лет опыта',
         blank=True,

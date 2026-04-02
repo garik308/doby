@@ -38,7 +38,7 @@ class Env:
 SECRET_KEY = Env.get_str('DJANGO_SECRET_KEY', 'django-insecure-default-dev-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True or Env.get_bool('DEBUG', False)
+DEBUG = Env.get_bool('DEBUG', False)
 
 ALLOWED_HOSTS = []
 if DEBUG:
@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    'drf_spectacular_sidecar',
     "django.contrib.staticfiles",
     'users',
     'sitters',
@@ -63,7 +64,6 @@ INSTALLED_APPS = [
     'pets',
     'rest_framework_simplejwt',
     'drf_spectacular',
-    'drf_spectacular_sidecar',
 ]
 
 MIDDLEWARE = [
@@ -166,7 +166,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],  # для локального Redis, в Docker можно использовать имя сервиса 'redis'
+            'hosts': [(os.environ.get('REDIS_HOST', '127.0.0.1'), os.environ.get('REDIS_PORT', 6379))],
         },
     },
 }

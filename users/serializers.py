@@ -19,12 +19,11 @@ class CitySerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
+    uuid = serializers.UUIDField(read_only=True)
+    username = serializers.CharField(label='Почта', max_length=150)
     first_name = serializers.CharField(label='Имя', max_length=255)
     last_name = serializers.CharField(label='Фамилия', max_length=255)
     patronymic = serializers.CharField(label='Отчество', max_length=255)
-    username = serializers.CharField(max_length=150)
-    email = serializers.EmailField()
     avatar = serializers.ImageField(allow_null=True)
     phone = serializers.CharField(max_length=15)
     city = CitySerializer(label='Город')

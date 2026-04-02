@@ -44,7 +44,4 @@ class CitiesRetrieveAPIView(APIView):
     )
     def get(self, request):
         """Получить все доступные города"""
-        return Response(
-            data=self.output_serializer(instance=City.objects.all(), many=True).data,
-            status=status.HTTP_200_OK,
-        )
+        return Response(data=self.output_serializer(instance=City.objects.all(), many=True).data)

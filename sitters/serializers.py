@@ -12,8 +12,8 @@ class UserForSitterProfileSerializer(serializers.Serializer):
     bio = serializers.CharField(max_length=500, allow_blank=True)
 
 
-class SittersPaginatedSerialzer(serializers.Serializer):
-    id = serializers.IntegerField(label='Идентификатор ситтера')
+class SitterSerialzer(serializers.Serializer):
+    uuid = serializers.UUIDField(label='Идентификатор ситтера')
     avatar = serializers.ImageField(allow_null=True)
     experience_years = serializers.IntegerField(label='Количество лет опыта')
     price_per_hour = serializers.DecimalField(
