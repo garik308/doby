@@ -7,7 +7,8 @@ django.setup()
 
 from django.contrib.auth import get_user_model
 from bookings.models import Booking
-from pets.models import Dog
+from pets.models import Pet
+from pets.constants import PetType
 from chats.models import ChatRoom
 from rest_framework_simplejwt.tokens import AccessToken
 from django.utils import timezone
@@ -39,10 +40,11 @@ sitter, _ = User.objects.get_or_create(
 sitter.set_password('testpass123')
 sitter.save()
 
-# Создаём собаку
-dog, _ = Dog.objects.get_or_create(
-    name='TestDog',
+# Создаём питомца
+pet, _ = Pet.objects.get_or_create(
+    name='TestPet',
     defaults={
+        'pet_type': PetType.DOG,
         'age': 3,
         'owner': user
     }
@@ -52,7 +54,7 @@ dog, _ = Dog.objects.get_or_create(
 booking, _ = Booking.objects.get_or_create(
     owner=user,
     sitter=sitter,
-    dog=dog,
+    pet=pet,
     defaults={
         'start_datetime': timezone.now() + timedelta(days=1),
         'end_datetime': timezone.now() + timedelta(days=2),

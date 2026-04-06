@@ -21,10 +21,11 @@ class Booking(AutoDateMixin):
         related_name='sitter_bookings',
         verbose_name='Ситтер'
     )
-    dog = models.ForeignKey(
-        'pets.Dog',
+    pet = models.ForeignKey(
+        'pets.Pet',
         on_delete=models.CASCADE,
-        verbose_name='Собака'
+        verbose_name='Питомец',
+        null=True,  # TODO Удалить null
     )
     start_datetime = models.DateTimeField(verbose_name='Начало')
     end_datetime = models.DateTimeField(verbose_name='Конец')
@@ -54,7 +55,7 @@ class Booking(AutoDateMixin):
         ]
 
     def __str__(self):
-        return f'Booking #{self.id}: {self.owner} -> {self.sitter} ({self.dog.name})'
+        return f'Booking #{self.id}: {self.owner} -> {self.sitter} ({self.pet})'
 
     def clean(self):
         """Валидация на уровне модели"""

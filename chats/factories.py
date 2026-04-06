@@ -7,7 +7,8 @@ from datetime import timedelta
 
 from chats.models import ChatRoom, Message
 from bookings.models import Booking
-from pets.models import Dog
+from pets.models import Pet
+from pets.constants import PetType
 
 User = get_user_model()
 
@@ -22,12 +23,13 @@ class UserFactory(DjangoModelFactory):
     is_active = True
 
 
-class DogFactory(DjangoModelFactory):
-    """Фабрика собак."""
+class PetFactory(DjangoModelFactory):
+    """Фабрика питомцев."""
 
     class Meta:
-        model = Dog
+        model = Pet
 
+    pet_type = PetType.DOG
     name = factory.Faker('first_name')
     age = factory.Faker('random_int', min=1, max=15)
     owner = factory.SubFactory(UserFactory)
@@ -39,7 +41,7 @@ class BookingFactory(DjangoModelFactory):
 
     owner = factory.SubFactory(UserFactory)
     sitter = factory.SubFactory(UserFactory)
-    dog = factory.SubFactory(DogFactory, owner=factory.SelfAttribute('..owner'))
+    pet = factory.SubFactory(PetFactory, owner=factory.SelfAttribute('..owner'))
     start_datetime = factory.LazyFunction(lambda: timezone.now() + timedelta(days=1))
     end_datetime = factory.LazyFunction(lambda: timezone.now() + timedelta(days=2))
     status = 'pending'

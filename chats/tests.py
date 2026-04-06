@@ -15,7 +15,7 @@ from chats.factories import ChatRoomFactory, UserFactory, BookingFactory
 from chats.routing import websocket_urlpatterns
 from django.contrib.auth import get_user_model
 from bookings.models import Booking
-from pets.models import Dog
+from pets.models import Pet
 
 
 User = get_user_model()

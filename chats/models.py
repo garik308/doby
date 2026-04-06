@@ -18,6 +18,10 @@ class ChatRoom(AutoDateMixin):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Чат'
+        verbose_name_plural = 'Чаты'
+
     def __str__(self):
         return f'Chat for booking {self.booking_id}'
 

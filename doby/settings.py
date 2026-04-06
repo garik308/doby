@@ -19,7 +19,6 @@ class Env:
     @staticmethod
     def get_bool(variable_name, default=False):
         variable = os.environ.get(variable_name, None)
-        print(variable)
         if variable is None:
             return default
         return variable.lower() == 'true'
@@ -192,3 +191,14 @@ SPECTACULAR_SETTINGS = {
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
     'REDOC_DIST': 'SIDECAR',
 }
+
+# Celery configuration
+CELERY_BROKER_URL = f'redis://{os.environ.get("REDIS_HOST", "127.0.0.1")}:{os.environ.get("REDIS_PORT", 6379)}/0'
+CELERY_RESULT_BACKEND = f'redis://{os.environ.get("REDIS_HOST", "127.0.0.1")}:{os.environ.get("REDIS_PORT", 6379)}/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Moscow'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes max per task
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Fair task distribution among workers

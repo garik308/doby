@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from users.models import City
+
 
 class SitterProfileSerializer(serializers.Serializer):
     experience_years = serializers.IntegerField(allow_null=True, required=False)
@@ -28,3 +30,19 @@ class UserSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=15)
     city = CitySerializer(label='Город')
     bio = serializers.CharField(max_length=500, allow_blank=True)
+
+
+class UserUpdateSerializer(serializers.Serializer):
+    """Сериализатор обновления данных пользователя"""
+    first_name = serializers.CharField(label='Имя', max_length=255, required=False)
+    last_name = serializers.CharField(label='Фамилия', max_length=255, required=False)
+    patronymic = serializers.CharField(label='Отчество', max_length=255, required=False)
+    phone = serializers.CharField(max_length=15, required=False, allow_blank=True, allow_null=True)
+    avatar = serializers.ImageField(required=False, allow_null=True)
+    city = serializers.PrimaryKeyRelatedField(
+        queryset=City.objects.all(),
+        required=False,
+        allow_null=True,
+        label='Город'
+    )
+    bio = serializers.CharField(max_length=1500, required=False, allow_blank=True)
