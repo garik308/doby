@@ -2,10 +2,9 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
 
 from users.models import City
-from users.serializers import UserBaseSerializer, CitySerializer, UserUpdateSerializer, UserRetieveSerializer
+from users.serializers import CitySerializer, UserUpdateSerializer, UserRetieveSerializer
 
 
 class MeRetrieveAPIView(APIView):
@@ -31,11 +30,13 @@ class MeRetrieveAPIView(APIView):
 class MeUpdateAPIView(APIView):
     """Обновление данных текущего пользователя"""
 
+    output_serializer = UserRetieveSerializer
+
     @extend_schema(
         summary='Обновить данные пользователя',
         request=UserUpdateSerializer,
         responses={
-            status.HTTP_200_OK: UserBaseSerializer,
+            status.HTTP_200_OK: output_serializer,
             status.HTTP_400_BAD_REQUEST: OpenApiResponse(response=None, description='Ошибка валидации'),
         },
     )
@@ -44,8 +45,7 @@ class MeUpdateAPIView(APIView):
         serializer = UserUpdateSerializer(instance=request.user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        output_serializer = UserBaseSerializer(instance=request.user)
-        return Response(data=output_serializer.data, status=status.HTTP_200_OK)
+        return Response(data=self.output_serializer(instance=request.user).data, status=status.HTTP_200_OK)
 
 
 class CitiesRetrieveAPIView(APIView):
