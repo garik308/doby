@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from pets.serializers import PetSerializer
 from users.models import City
 
 
@@ -20,7 +21,7 @@ class CitySerializer(serializers.Serializer):
     translit = serializers.CharField(label='Транслит')
 
 
-class UserSerializer(serializers.Serializer):
+class UserBaseSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(read_only=True)
     username = serializers.CharField(label='Почта', max_length=150)
     first_name = serializers.CharField(label='Имя', max_length=255)
@@ -30,6 +31,10 @@ class UserSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=15)
     city = CitySerializer(label='Город')
     bio = serializers.CharField(max_length=500, allow_blank=True)
+
+
+class UserRetieveSerializer(UserBaseSerializer):
+    pets = PetSerializer(label='Питомцы', many=True)
 
 
 class UserUpdateSerializer(serializers.Serializer):

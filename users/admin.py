@@ -21,7 +21,7 @@ class MyUserAdmin(UserAdmin):
     ordering = ('-date_joined',)
     
     fieldsets = UserAdmin.fieldsets + (
-        ('Дополнительно', {'fields': ('patronymic', 'phone', 'avatar', 'city', 'bio', 'sitter_profile')}),
+        ('Дополнительно', {'fields': ('uuid', 'patronymic', 'phone', 'avatar', 'city', 'bio', 'sitter_profile')}),
     )
     
-    readonly_fields = ('date_joined', 'last_login')
+    readonly_fields = ('date_joined', 'last_login', 'uuid')

@@ -5,13 +5,13 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 
 from users.models import City
-from users.serializers import UserSerializer, CitySerializer, UserUpdateSerializer
+from users.serializers import UserBaseSerializer, CitySerializer, UserUpdateSerializer, UserRetieveSerializer
 
 
-class UserRetrieveAPIView(APIView):
+class MeRetrieveAPIView(APIView):
     """Получить Данные текущего пользователя"""
 
-    output_serializer = UserSerializer
+    output_serializer = UserRetieveSerializer
 
     @extend_schema(
         summary=__doc__,
@@ -24,19 +24,18 @@ class UserRetrieveAPIView(APIView):
     )
     def get(self, request):
         """Получить данные текущего пользователя"""
-        user = request.user
-        serializer = self.output_serializer(instance=user)
+        serializer = self.output_serializer(instance=(request.user))
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class UserUpdateAPIView(APIView):
+class MeUpdateAPIView(APIView):
     """Обновление данных текущего пользователя"""
 
     @extend_schema(
         summary='Обновить данные пользователя',
         request=UserUpdateSerializer,
         responses={
-            status.HTTP_200_OK: UserSerializer,
+            status.HTTP_200_OK: UserBaseSerializer,
             status.HTTP_400_BAD_REQUEST: OpenApiResponse(response=None, description='Ошибка валидации'),
         },
     )
@@ -45,7 +44,7 @@ class UserUpdateAPIView(APIView):
         serializer = UserUpdateSerializer(instance=request.user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        output_serializer = UserSerializer(instance=request.user)
+        output_serializer = UserBaseSerializer(instance=request.user)
         return Response(data=output_serializer.data, status=status.HTTP_200_OK)
 
 

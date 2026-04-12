@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from users.models import User
-from users.serializers import UserSerializer
+from users.serializers import UserBaseSerializer
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -14,7 +14,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class OutputUserRegisterSerializer(serializers.Serializer):
-    user = UserSerializer(label='Данные о пользователе')
+    user = UserBaseSerializer(label='Данные о пользователе')
     access_token = serializers.CharField(label='Токен доступа')
     refresh_token = serializers.CharField(label='Токен для обновления access_token')
 

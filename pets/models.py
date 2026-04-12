@@ -15,9 +15,13 @@ class Pet(AutoDateMixin):
         choices=PetType.choices,
         default=PetType.DOG
     )
+    owner = models.ForeignKey('users.User', related_name='pets', verbose_name='Владелец', on_delete=models.CASCADE)
     name = models.CharField(verbose_name='Имя питомца', max_length=100)
     age = models.IntegerField(verbose_name='Возраст', validators=[MinValueValidator(1), MaxValueValidator(100)])
-    owner = models.ForeignKey('users.User', verbose_name='Владелец', on_delete=models.CASCADE)
+    height = models.IntegerField(verbose_name='Рост, см', validators=[MinValueValidator(1), MaxValueValidator(500)], null=True, blank=True)
+    weight = models.IntegerField(verbose_name='Вес, кг', validators=[MinValueValidator(1), MaxValueValidator(300)], null=True, blank=True)
+    breed_name = models.CharField(verbose_name='Название породы', max_length=100, null=True, blank=True)
+
 
     class Meta:
         verbose_name = 'Питомец'

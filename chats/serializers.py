@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from .models import Message, ChatRoom
-from users.serializers import UserSerializer
+from users.serializers import UserBaseSerializer
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
+    sender = UserBaseSerializer(read_only=True)
 
     class Meta:
         model = Message
@@ -13,7 +13,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class ChatRoomSerializer(serializers.ModelSerializer):
     messages = MessageSerializer(many=True, read_only=True)
-    participants = UserSerializer(many=True, read_only=True)
+    participants = UserBaseSerializer(many=True, read_only=True)
 
     class Meta:
         model = ChatRoom
