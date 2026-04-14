@@ -23,7 +23,7 @@ class MeRetrieveAPIView(APIView):
     )
     def get(self, request):
         """Получить данные текущего пользователя"""
-        serializer = self.output_serializer(instance=(request.user))
+        serializer = self.output_serializer(instance=request.user)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 

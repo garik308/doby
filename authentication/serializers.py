@@ -19,6 +19,18 @@ class OutputUserRegisterSerializer(serializers.Serializer):
     refresh_token = serializers.CharField(label='Токен для обновления access_token')
 
 
+
+class UserLoginSerializer(serializers.Serializer):
+    username = serializers.EmailField(label='Почта')
+    password = serializers.CharField(label='Пароль', min_length=8)
+
+
+class OutputUserLoginSerializer(serializers.Serializer):
+    user = UserBaseSerializer(label='Данные о пользователе')
+    access_token = serializers.CharField(label='Токен доступа')
+    refresh_token = serializers.CharField(label='Токен для обновления access_token')
+
+
 # class SitterRegisterSerialzer(serializers.Serializer):
 #     id = serializers.IntegerField(label='Идентификатор ситтера')
 #     experience_years = serializers.IntegerField(label='Количество лет опыта')

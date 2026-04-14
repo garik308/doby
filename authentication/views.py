@@ -1,14 +1,16 @@
-from django.db import transaction
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from authentication.serializers import (
     UserRegisterSerializer,
     OutputUserRegisterSerializer,
+    OutputUserLoginSerializer,
 )
 from users.models import User
 
@@ -45,6 +47,34 @@ class RegisterView(APIView):
             }).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+class LoginView(APIView):
+
+    permission_classes = (AllowAny,)
+    input_serializer_class = TokenObtainPairSerializer
+    output_serializer_class = OutputUserLoginSerializer
+
+    @extend_schema(
+        request=input_serializer_class,
+        responses=output_serializer_class,
+    )
+    def post(self, request):
+        serializer = self.input_serializer_class(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0]) from e
+
+        return Response(
+            OutputUserLoginSerializer({
+                'user': serializer.user,
+                'access_token': serializer.validated_data['access'],
+                'refresh_token': serializer.validated_data['refresh'],
+            }).data,
+        )
+
 
 # Вдруг понадобится
 # class RegisterSitterAPIView(APIView):
