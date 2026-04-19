@@ -32,12 +32,15 @@ services:
 
   web:
     build: .
+    expose:
+      - "8000"
     command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
+      - static_volume:/app/static          # статика для nginx
+      - protected_media_volume:/app/protected  # защищённые файлы
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DEBUG=${DEBUG}
@@ -53,7 +56,19 @@ services:
       - redis
     restart: unless-stopped
 
-  # Celery worker для обработки задач
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/static:ro
+      - protected_media_volume:/protected:ro
+    depends_on:
+      - web
+    restart: unless-stopped
+
   celery-worker:
     build: .
     container_name: doby-celery-worker
@@ -106,3 +121,5 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  static_volume:
+  protected_media_volume:

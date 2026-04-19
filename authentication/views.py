@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from authentication.serializers import (
     UserRegisterSerializer,
@@ -76,55 +77,19 @@ class LoginView(APIView):
         )
 
 
-# Вдруг понадобится
-# class RegisterSitterAPIView(APIView):
-#     """Зарегистрировать юзера как ситтера"""
-#
-#     authentication_classes = []
-#     permission_classes = (AllowAny,)
-#     input_serializer_class = ComplexSitterRegisterSerializer
-#     output_serializer_class = OutputSitterRegisterSerializer
-#
-#     @extend_schema(
-#         request=input_serializer_class,
-#         responses={status.HTTP_201_CREATED: output_serializer_class,},
-#     )
-#     def post(self, request):
-#         serializer = self.input_serializer_class(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         user_validated_data = serializer.validated_data['user_data']
-#         sitter_validated_data = serializer.validated_data['sitter_data']
-#         city_translit = user_validated_data.pop('city_translit')
-#         email = user_validated_data.pop('email')
-#         phone = user_validated_data.pop('phone')
-#         if email and User.objects.filter(email__isnull=False, email=email).exists():
-#             raise ValidationError({'detail': 'Email already registered'})
-#         if phone and User.objects.filter(phone__isnull=False, phone=phone).exists():
-#             raise ValidationError({'detail': 'Phone already registered'})
-#
-#         with transaction.atomic():
-#             sitter = SitterProfile.objects.create(**sitter_validated_data)
-#             city = City.objects.get(translit=city_translit)
-#             user = User.objects.create_user(
-#                 email=email,
-#                 phone=phone,
-#                 city=city,
-#                 sitter=sitter,
-#                 **user_validated_data,
-#             )
-#
-#         refresh = RefreshToken.for_user(user)
-#         access_token = str(refresh.access_token)
-#         refresh_token = str(refresh)
-#
-#         user_data = UserSerializer(user).data
-#         sitter_data = SitterSerialzer(sitter).data
-#         return Response(
-#             self.output_serializer_class({
-#                 'user': user_data,
-#                 'sitter': sitter_data,
-#                 'access_token': access_token,
-#                 'refresh_token': refresh_token,
-#             }).data,
-#             status=status.HTTP_201_CREATED,
-#         )
+class LogoutView(APIView):
+    """Добавляет все пользовательские refresh-токены в черный список"""
+
+    def post(self, request):
+        already_revoked_count = 0
+        tokens = OutstandingToken.objects.filter(user=request.user)
+        for token in tokens:
+            try:
+                refresh_token = RefreshToken(token.token)
+                refresh_token.blacklist()
+            except Exception:
+                # Токен, возможно, уже в черном списке или истек
+                already_revoked_count += 1
+                pass
+
+        return Response({'revoke_count': len(tokens) - already_revoked_count}, status=status.HTTP_200_OK)

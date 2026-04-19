@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
     cron \
+    libmagic1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Обновляем pip и устанавливаем Poetry через pip

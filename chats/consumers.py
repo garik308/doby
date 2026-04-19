@@ -1,8 +1,12 @@
 import json
+import logging
+
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from .models import ChatRoom, Message
+from .serializers import MessageSerializer
+from .utils import create_ws_text_message_data
 
 User = get_user_model()
 
@@ -13,25 +17,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         """Вызывается при попытке клиента подключиться к WebSocket."""
         self.chat_id = self.scope['url_route']['kwargs']['chat_id']
-        self.room_group_name = f'chat_{self.chat_id}'
+        self.chat_group_name = f'chat_{self.chat_id}'
 
         user = self.scope['user']
         if user.is_anonymous:
             await self.close()
-        elif await self.is_participant(user.id, self.chat_id):
-            # Добавляем пользователя в группу (channel layer)
-            await self.channel_layer.group_add(
-                self.room_group_name,
-                self.channel_name
-            )
-            await self.accept()
-        else:
+
+        if not await self.is_participant(user.id, self.chat_id):
             await self.close()
+
+        await self.channel_layer.group_add(
+            self.chat_group_name,
+            self.channel_name
+        )
+        await self.accept()
 
     async def disconnect(self, close_code):
         """При отключении удаляем пользователя из группы."""
         await self.channel_layer.group_discard(
-            self.room_group_name,
+            self.chat_group_name,
             self.channel_name
         )
 
@@ -45,29 +49,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }))
             return
         
-        message_text = data.get('message')
-        if not message_text:
-            await self.send(text_data=json.dumps({
-                'error': 'Missing "message" field in request'
-            }))
-            return
-
+        message_text = data.get('message', '')
         user = self.scope['user']
-
-        # Сохраняем сообщение в базу данных
         saved_message = await self.save_message(user, self.chat_id, message_text)
-
-        # Отправляем сообщение всем в группе (включая отправителя)
         await self.channel_layer.group_send(
-            self.room_group_name,
+            self.chat_group_name,
             {
-                'type': 'chat_message',  # это имя метода, который будет вызван
-                'message': message_text,
-                'sender_uuid': str(user.uuid),
-                'sender_username': user.username,
-                'dt_created': saved_message.dt_created.isoformat(),
-                'message_id': saved_message.id,
-            }
+                'type': 'chat_message',
+                **MessageSerializer(saved_message).data,
+            },
         )
 
     async def chat_message(self, event):

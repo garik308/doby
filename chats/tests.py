@@ -1,8 +1,5 @@
 import pytest
 from asgiref.sync import sync_to_async
-import json
-import os
-from django.db import connection
 
 from channels.testing import WebsocketCommunicator
 from channels.routing import URLRouter
@@ -10,12 +7,9 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from rest_framework_simplejwt.tokens import AccessToken
 
 from chats.middleware import JWTAuthMiddleware
-from chats.models import ChatRoom, Message
 from chats.factories import ChatRoomFactory, UserFactory, BookingFactory
 from chats.routing import websocket_urlpatterns
 from django.contrib.auth import get_user_model
-from bookings.models import Booking
-from pets.models import Pet
 
 
 User = get_user_model()
