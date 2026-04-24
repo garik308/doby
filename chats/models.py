@@ -37,7 +37,8 @@ class Message(AutoDateMixin):
     )
     sender = models.ForeignKey(
         to='users.User',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
     )
     text = models.CharField(verbose_name='Сообщение', max_length=4000, blank=True)
     original_filename = models.CharField(

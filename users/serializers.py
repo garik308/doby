@@ -27,7 +27,6 @@ class UserBaseSerializer(serializers.Serializer):
     first_name = serializers.CharField(label='Имя', max_length=255)
     last_name = serializers.CharField(label='Фамилия', max_length=255)
     patronymic = serializers.CharField(label='Отчество', max_length=255)
-    avatar = serializers.ImageField(allow_null=True)
     phone = serializers.CharField(max_length=15)
     city = CitySerializer(label='Город')
     bio = serializers.CharField(max_length=500, allow_blank=True)
@@ -51,3 +50,13 @@ class UserUpdateSerializer(serializers.Serializer):
         label='Город'
     )
     bio = serializers.CharField(max_length=1500, required=False, allow_blank=True)
+
+
+class UserForDeleteSerializer(UserBaseSerializer):
+    user_id = serializers.IntegerField(read_only=True, source='user.id')
+    city = serializers.PrimaryKeyRelatedField(
+        queryset=City.objects.all(),
+        required=False,
+        allow_null=True,
+        label='Город',
+    )

@@ -13,6 +13,13 @@ class SitterProfile(AutoDateMixin):
     """
 
     uuid = models.UUIDField('UUID', default=uuid.uuid4, unique=True, primary_key=True)
+    user = models.OneToOneField(
+        to='users.User',
+        on_delete=models.CASCADE,
+        related_name='sitter_profile',
+        null=True,
+        blank=True,
+    )
     experience_years = models.IntegerField(
         'Количество лет опыта',
         blank=True,

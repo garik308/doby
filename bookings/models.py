@@ -11,21 +11,25 @@ class Booking(AutoDateMixin):
 
     owner = models.ForeignKey(
         'users.User',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='owner_bookings',
-        verbose_name='Собачник'
+        verbose_name='Собачник',
+        null=True,
+        blank=True,
     )
     sitter = models.ForeignKey(
         'users.User',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='sitter_bookings',
-        verbose_name='Ситтер'
+        verbose_name='Ситтер',
+        null=True,
+        blank=True,
     )
     pet = models.ForeignKey(
         'pets.Pet',
         on_delete=models.CASCADE,
         verbose_name='Питомец',
-        null=True,  # TODO Удалить null
+        null=True,
     )
     start_datetime = models.DateTimeField(verbose_name='Начало')
     end_datetime = models.DateTimeField(verbose_name='Конец')
