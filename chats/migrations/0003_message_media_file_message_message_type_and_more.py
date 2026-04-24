@@ -3,6 +3,8 @@
 import chats.storages
 from django.db import migrations, models
 
+import utils.storages
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -16,7 +18,7 @@ class Migration(migrations.Migration):
             field=models.FileField(
                 blank=True,
                 null=True,
-                storage=chats.storages.ProtectedStorage,
+                storage=utils.storages.ProtectedStorage,
                 upload_to=chats.storages.chat_media_upload_path,
                 verbose_name="Прикрепленный файл",
             ),

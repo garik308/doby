@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from pets.serializers import PetSerializer
-from users.models import City
+from users.models import City, UserPhoto
 
 
 class SitterProfileSerializer(serializers.Serializer):
@@ -32,8 +32,23 @@ class UserBaseSerializer(serializers.Serializer):
     bio = serializers.CharField(max_length=500, allow_blank=True)
 
 
+class UserPhotoSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = UserPhoto
+        fields = ('id', 'image', 'image_url', 'order_number', 'is_main')
+        extra_kwargs = {
+            'image': {'write_only': True},
+        }
+
+    def get_image_url(self, obj):
+        return obj.image.url if obj.image else None
+
+
 class UserRetieveSerializer(UserBaseSerializer):
     pets = PetSerializer(label='Питомцы', many=True)
+    photos = UserPhotoSerializer(label='Фотографии', many=True, read_only=True)
 
 
 class UserUpdateSerializer(serializers.Serializer):

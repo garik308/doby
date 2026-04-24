@@ -26,6 +26,7 @@ redis = "^7.4.0"
 libmagic = "^1.0"
 python-magic = "^0.4.27"
 django-celery-beat = "^2.9.0"
+django-cleanup = "^9.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.0"

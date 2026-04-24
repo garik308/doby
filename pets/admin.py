@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from pets.models import Pet
+from pets.models import Pet, PetPhoto
 
 
 @admin.register(Pet)
@@ -12,3 +12,11 @@ class PetAdmin(admin.ModelAdmin):
     readonly_fields = ('dt_created', 'dt_updated')
     raw_id_fields = ('owner',)
     ordering = ('name',)
+
+
+@admin.register(PetPhoto)
+class PetPhotoAdmin(admin.ModelAdmin):
+    list_display = ('pet', 'image', 'order_number', 'is_main')
+    list_filter = ('dt_created', 'dt_updated')
+    search_fields = ('pet',)
+    readonly_fields = ('dt_created', 'dt_updated')

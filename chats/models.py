@@ -1,7 +1,8 @@
 from django.db import models
 
 from chats.constants import MessageType
-from chats.storages import ProtectedStorage, chat_media_upload_path
+from chats.storages import chat_media_upload_path
+from utils.storages import ProtectedStorage
 from utils.mixins import AutoDateMixin
 
 

@@ -1,8 +1,10 @@
 import uuid
 
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
 from django.db import models
 
+from users.storages import user_photo_upload_path
 from utils.mixins import AutoDateMixin
 
 
@@ -23,7 +25,6 @@ class User(AbstractUser):
     last_name = models.CharField('Фамилия', blank=True, max_length=255)
     patronymic = models.CharField('Отчество', blank=True, max_length=255)
     phone = models.CharField('номер телефона', max_length=15, null=True, blank=True)
-    avatar = models.ImageField('аватарка', upload_to='avatars/', null=True, blank=True)
     city = models.ForeignKey(to='users.City', on_delete=models.SET_NULL, null=True, blank=True)
     bio = models.TextField('Информация', max_length=1500, blank=True)
 
@@ -46,6 +47,22 @@ class User(AbstractUser):
                 name='user_phone_unique_if_filled',
             ),
         ]
+
+
+class UserPhoto(AutoDateMixin):
+    user = models.ForeignKey(verbose_name='Пользователь', to='users.User', related_name='photos', on_delete=models.CASCADE)
+    image = models.ImageField(
+        verbose_name='Фото',
+        upload_to=user_photo_upload_path,
+        validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'tiff', 'ico'])],
+    )
+    order_number = models.IntegerField(verbose_name='Порядок отображения',
+                                       validators=[MinValueValidator(1), MaxValueValidator(100)])
+    is_main = models.BooleanField(verbose_name='Основное фото', default=False)
+
+    class Meta:
+        verbose_name = "Фото пользователя"
+        verbose_name_plural = "Фото пользователей"
 
 
 class DeletedUser(AutoDateMixin):

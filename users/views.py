@@ -1,14 +1,17 @@
 from django.db import transaction
+from django.db.models import Max
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework import status
+from rest_framework.generics import get_object_or_404
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from bookings.models import Booking
 from pets.models import Pet
-from users.models import City, DeletedUser
+from users.models import City, DeletedUser, UserPhoto
 from users.serializers import CitySerializer, UserUpdateSerializer, UserRetieveSerializer, UserBaseSerializer, \
-    UserForDeleteSerializer
+    UserForDeleteSerializer, UserPhotoSerializer
 
 
 class MeRetrieveAPIView(APIView):
@@ -108,3 +111,55 @@ class DeleteUserProfileView(APIView):
             deleted_user.save()
 
         return Response()
+
+
+class UserPhotoCreateView(APIView):
+    input_serializer = UserPhotoSerializer
+    output_serializer = UserPhotoSerializer
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(
+        summary='Добавить фото Пользователю',
+        request=input_serializer,
+        responses={
+            status.HTTP_201_CREATED: output_serializer,
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(response=None, description='Ошибка валидации'),
+        },
+    )
+    def post(self, request):
+        """Загрузить новое фото для питомца (один файл)"""
+        serializer = self.input_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        max_order = request.user.photos.aggregate(Max('order_number'))['order_number__max'] or 0
+        UserPhoto.objects.create(
+            user=request.user,
+            image=serializer.validated_data['image'],
+            order_number=max_order + 1,
+            is_main=False,
+        )
+
+        output_serializer = self.output_serializer(request.user.photos.all(), many=True)
+        return Response(output_serializer.data, status=status.HTTP_201_CREATED)
+
+
+class UserPhotoDeleteView(APIView):
+    output_serializer = UserPhotoSerializer
+    parser_classes = [MultiPartParser]
+
+    @extend_schema(
+        summary='Добавить фото Пользователю',
+        request=None,
+        responses={
+            status.HTTP_201_CREATED: output_serializer,
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(response=None, description='Ошибка валидации'),
+        },
+    )
+    def delete(self, request, photo_id):
+        """Удалить фото пользователя"""
+        photo = get_object_or_404(UserPhoto, pk=photo_id)
+        photo.delete()
+        return Response(
+            self.output_serializer(request.user.photos.all(), many=True).data,
+            status=status.HTTP_201_CREATED,
+        )

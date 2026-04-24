@@ -40,6 +40,7 @@ services:
     volumes:
       - .:/app
       - static_volume:/app/static          # статика для nginx
+      - media_volume:/app/media
       - protected_media_volume:/app/protected  # защищённые файлы
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
@@ -64,6 +65,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - static_volume:/static:ro
+      - media_volume:/media:ro
       - protected_media_volume:/protected:ro
     depends_on:
       - web
@@ -122,4 +124,5 @@ volumes:
   postgres_data:
   redis_data:
   static_volume:
+  media_volume:
   protected_media_volume:

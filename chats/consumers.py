@@ -6,13 +6,12 @@ from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from .models import ChatRoom, Message
 from .serializers import MessageSerializer
-from .utils import create_ws_text_message_data
 
 User = get_user_model()
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
-    """Консьюмер для чатов <UNK> <UNK>"""
+    """Консьюмер для чатов"""
 
     async def connect(self):
         """Вызывается при попытке клиента подключиться к WebSocket."""

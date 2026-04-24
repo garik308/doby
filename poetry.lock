@@ -863,6 +863,18 @@ python-crontab = ">=2.3.4"
 tzdata = "*"
 
 [[package]]
+name = "django-cleanup"
+version = "9.0.0"
+description = "Deletes old files."
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "django_cleanup-9.0.0-py3-none-any.whl", hash = "sha256:19f8b0e830233f9f0f683b17181f414672a0f48afe3ea3cc80ba47ae40ad880c"},
+    {file = "django_cleanup-9.0.0.tar.gz", hash = "sha256:bb9fb560aaf62959c81e31fa40885c36bbd5854d5aa21b90df2c7e4ba633531e"},
+]
+
+[[package]]
 name = "django-rest-framework"
 version = "0.1.0"
 description = "alias."
@@ -2644,4 +2656,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "8894af7e4e6ea209435b912f9cb166744a19cf31315c48337e9258dcadedec8d"
+content-hash = "eedb9339bc8c15876cb5c069dd5cab82cc5888b2d2d5afd9b1305ae54c0f1d5b"
