@@ -47,7 +47,7 @@ class PetCreateAPIView(APIView):
         )
 
 
-class PetUpdateAPIView(APIView):
+class PetUpdateDeleteAPIView(APIView):
     """Обновление питомца"""
 
     parser_classes = [MultiPartParser]
@@ -117,6 +117,20 @@ class PetUpdateAPIView(APIView):
             data=self.output_serializer(Pet.objects.prefetch_related('photos').get(id=pet.id)).data,
             status=status.HTTP_201_CREATED,
         )
+
+    @extend_schema(
+        summary='Удалить питомца 😞',
+        request=None,
+        responses={
+            status.HTTP_200_OK: None,
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(response=None, description='Питомец не найден'),
+        },
+    )
+    def delete(self, request, pet_id):
+        """Удалить питомца"""
+        pet = get_object_or_404(Pet, id=pet_id, owner=request.user)
+        pet.delete()
+        return Response()
 
 
 class PetRetrieveAPIView(APIView):
