@@ -33,6 +33,18 @@ class Env:
             return default
         return variable
 
+    @staticmethod
+    def get_list(variable_name, default=None):
+        if default is None:
+            default = []
+
+        variable = os.environ.get(variable_name, None)
+        if not variable:
+            return default
+
+        return [item.strip() for item in variable.split(',') if item.strip()]
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 

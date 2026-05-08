@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView
 
+from doby.views import health_check
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('authentication.urls')),
@@ -10,6 +12,7 @@ urlpatterns = [
     path('api/sitters/', include('sitters.urls')),
     path('api/chat/', include('chats.urls')),
     path('api/pets/', include('pets.urls')),
+    path('health/', health_check),
 ]
 
 if settings.DEBUG:

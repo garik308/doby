@@ -1,0 +1,116 @@
+services:
+  - type: web
+    name: doby-web
+    runtime: image
+    repo: https://github.com/garik308/doby
+    branch: master
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: DEBUG
+        value: "False"
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: doby-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: doby-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: doby-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: doby-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: doby-db
+          property: port
+      - key: REDIS_URL
+        fromService:
+          name: doby-redis
+          type: redis
+          property: connectionString
+      - key: DJANGO_SETTINGS_MODULE
+        value: "doby.settings_production"
+    healthCheckPath: /health/
+
+  - type: redis
+    name: doby-redis
+    plan: free
+    maxmemoryPolicy: noeviction
+
+  - type: worker
+    name: doby-celery-worker
+    runtime: image
+    dockerfilePath: ./Dockerfile
+    command: "celery -A doby worker --loglevel=info"
+    envVars:
+      - fromService:
+          name: doby-web
+          type: web
+          envVarKey: DJANGO_SECRET_KEY
+      - key: REDIS_URL
+        fromService:
+          name: doby-redis
+          type: redis
+          property: connectionString
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: DEBUG
+        value: "False"
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: doby-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: doby-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: doby-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: doby-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: doby-db
+          property: port
+      - key: REDIS_URL
+        fromService:
+          name: doby-redis
+          type: redis
+          property: connectionString
+      - key: DJANGO_SETTINGS_MODULE
+        value: "doby.settings_production"
+    healthCheckPath: /health/
+
+  - type: cronjob
+    name: doby-celery-beat
+    schedule: "0 */1 * * *"  # каждый час, можно реже
+    runtime: image
+    dockerfilePath: ./Dockerfile
+    command: "celery -A doby beat --loglevel=info"
+    envVars:
+      - fromService:
+          name: doby-web
+          type: web
+          envVarKey: DJANGO_SECRET_KEY
+      - key: REDIS_URL
+        fromService:
+          name: doby-redis
+          type: redis
+          property: connectionString
+
+databases:
+  - name: doby-db
+    databaseName: doby_db
+    user: doby_user
+    plan: free

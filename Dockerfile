@@ -5,6 +5,7 @@ FROM python:3.11-slim
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
+    curl \
     cron \
     libmagic1 \
     && rm -rf /var/lib/apt/lists/*
@@ -22,11 +23,15 @@ WORKDIR /app
 # Копируем файлы зависимостей
 COPY pyproject.toml poetry.lock ./
 
-# Устанавливаем зависимости (включая dev)
-RUN poetry install --no-interaction --no-ansi --no-root
+# Установка зависимостей без dev
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi --no-root --only main
 
 # Копируем весь проект
 COPY . .
 
+# Сборка статики (если нужно)
+RUN python manage.py collectstatic --noinput
+
 # Команда по умолчанию
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "doby.asgi:application"]
