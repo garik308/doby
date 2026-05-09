@@ -5,6 +5,7 @@ services:
     repo: https://github.com/garik308/doby
     branch: master
     dockerfilePath: ./Dockerfile
+    preDeployCommand: "python manage.py migrate --noinput"ё
     envVars:
       - key: DJANGO_SECRET_KEY
         sync: false
