@@ -51,12 +51,8 @@ services:
     name: doby-celery-worker
     runtime: image
     dockerfilePath: ./Dockerfile
-    command: "celery -A doby worker --loglevel=info"
+    buildCommand: "celery -A doby worker --loglevel=info"
     envVars:
-      - fromService:
-          name: doby-web
-          type: web
-          envVarKey: DJANGO_SECRET_KEY
       - key: REDIS_URL
         fromService:
           name: doby-redis
