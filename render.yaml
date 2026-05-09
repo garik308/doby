@@ -92,7 +92,7 @@ services:
           type: redis
           property: connectionString
       - key: DJANGO_SETTINGS_MODULE
-        value: "doby.settings_production"
+        value: "doby.settings_prod"
     healthCheckPath: /health/
 
   - type: cronjob
