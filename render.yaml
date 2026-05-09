@@ -95,23 +95,6 @@ services:
         value: "doby.settings_prod"
     healthCheckPath: /health/
 
-  - type: cronjob
-    name: doby-celery-beat
-    schedule: "0 */1 * * *"  # каждый час, можно реже
-    runtime: image
-    dockerfilePath: ./Dockerfile
-    command: "celery -A doby beat --loglevel=info"
-    envVars:
-      - fromService:
-          name: doby-web
-          type: web
-          envVarKey: DJANGO_SECRET_KEY
-      - key: REDIS_URL
-        fromService:
-          name: doby-redis
-          type: redis
-          property: connectionString
-
 databases:
   - name: doby-db
     databaseName: doby_db
