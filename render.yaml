@@ -1,11 +1,10 @@
 services:
   - type: web
     name: doby-web
-    runtime: image
     repo: https://github.com/garik308/doby
     branch: master
     dockerfilePath: ./Dockerfile
-    buildCommand: "echo DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE && python manage.py migrate --noinput"
+    preDeployCommand: "python manage.py migrate --noinput && python manage.py collectstatic --noinput"
     envVars:
       - key: DJANGO_SECRET_KEY
         sync: false
@@ -46,12 +45,14 @@ services:
     name: doby-redis
     plan: free
     maxmemoryPolicy: noeviction
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: Allow all
 
   - type: worker
     name: doby-celery-worker
-    runtime: image
     dockerfilePath: ./Dockerfile
-    buildCommand: "celery -A doby worker --loglevel=info"
+    command: "celery -A doby worker --loglevel=info"
     envVars:
       - key: REDIS_URL
         fromService:
@@ -82,14 +83,8 @@ services:
         fromDatabase:
           name: doby-db
           property: port
-      - key: REDIS_URL
-        fromService:
-          name: doby-redis
-          type: redis
-          property: connectionString
       - key: DJANGO_SETTINGS_MODULE
         value: "doby.settings_prod"
-    healthCheckPath: /health/
 
 databases:
   - name: doby-db
