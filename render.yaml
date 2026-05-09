@@ -5,7 +5,7 @@ services:
     repo: https://github.com/garik308/doby
     branch: master
     dockerfilePath: ./Dockerfile
-    preDeployCommand: "python manage.py migrate --noinput"ё
+    preDeployCommand: "python manage.py migrate --noinput"
     envVars:
       - key: DJANGO_SECRET_KEY
         sync: false
@@ -36,8 +36,10 @@ services:
           name: doby-redis
           type: redis
           property: connectionString
+      - key: ALLOWED_HOSTS
+        value: "doby-x7do.onrender.com"
       - key: DJANGO_SETTINGS_MODULE
-        value: "doby.settings_production"
+        value: "doby.settings_prod"
     healthCheckPath: /health/
 
   - type: redis
