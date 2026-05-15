@@ -53,17 +53,16 @@ class UserRetieveSerializer(UserBaseSerializer):
 
 class UserUpdateSerializer(serializers.Serializer):
     """Сериализатор обновления данных пользователя"""
-    first_name = serializers.CharField(label='Имя', max_length=255, required=False)
-    last_name = serializers.CharField(label='Фамилия', max_length=255, required=False)
-    patronymic = serializers.CharField(label='Отчество', max_length=255, required=False)
-    phone = serializers.CharField(max_length=15, required=False, allow_blank=True, allow_null=True)
+    first_name = serializers.CharField(label='Имя', max_length=255, allow_blank=True)
+    last_name = serializers.CharField(label='Фамилия', max_length=255, allow_blank=True)
+    patronymic = serializers.CharField(label='Отчество', max_length=255, allow_blank=True)
+    phone = serializers.CharField(max_length=15, allow_blank=True, allow_null=True)
     city = serializers.PrimaryKeyRelatedField(
         queryset=City.objects.all(),
-        required=False,
         allow_null=True,
         label='Город'
     )
-    bio = serializers.CharField(max_length=1500, required=False, allow_blank=True)
+    bio = serializers.CharField(max_length=1500, allow_blank=True)
 
     def update(self, instance, validated_data):
             for attr, value in validated_data.items():
