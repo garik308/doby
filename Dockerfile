@@ -30,8 +30,5 @@ RUN poetry config virtualenvs.create false \
 # Копируем весь проект
 COPY . .
 
-# Сборка статики (если нужно)
-RUN python manage.py collectstatic --noinput
-
-# Команда по умолчанию
+# Команда по умолчанию (collectstatic теперь запускается через docker-compose command)
 CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "doby.asgi:application"]

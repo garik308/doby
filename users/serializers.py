@@ -57,7 +57,6 @@ class UserUpdateSerializer(serializers.Serializer):
     last_name = serializers.CharField(label='Фамилия', max_length=255, required=False)
     patronymic = serializers.CharField(label='Отчество', max_length=255, required=False)
     phone = serializers.CharField(max_length=15, required=False, allow_blank=True, allow_null=True)
-    avatar = serializers.ImageField(required=False, allow_null=True)
     city = serializers.PrimaryKeyRelatedField(
         queryset=City.objects.all(),
         required=False,
@@ -65,6 +64,12 @@ class UserUpdateSerializer(serializers.Serializer):
         label='Город'
     )
     bio = serializers.CharField(max_length=1500, required=False, allow_blank=True)
+
+    def update(self, instance, validated_data):
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
+            return instance
 
 
 class UserForDeleteSerializer(UserBaseSerializer):
