@@ -33,8 +33,8 @@ class PetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pet
-        fields = ('id', 'pet_type', 'pet_type_display', 'owner_uuid', 'name', 'age', 'height', 'uploaded_photos',
-            'weight', 'breed_name', 'diet_type', 'diet_pattern', 'warning_tags', 'specific_features',
+        fields = ('id', 'pet_type', 'pet_type_display', 'owner_uuid', 'name', 'age', 'sex', 'height', 'uploaded_photos',
+            'weight', 'breed_name', 'diet_type', 'diet_pattern', 'warning_tags', 'specific_features', 'additional_info',
             'diet_additional_info', 'photos', 'dt_created', 'dt_updated')
         read_only_fields = ('id', 'dt_created', 'dt_updated')
 
@@ -45,7 +45,7 @@ class PetUpdateSerializer(PetSerializer):
 
     class Meta:
         model = Pet
-        fields = ('id', 'pet_type', 'pet_type_display', 'owner_uuid', 'name', 'age', 'height', 'uploaded_photos',
-            'weight', 'breed_name', 'diet_type', 'diet_pattern', 'warning_tags', 'specific_features', 'photo_ids',
-            'diet_additional_info', 'photos', 'dt_created', 'dt_updated')
+        fields = ('id', 'pet_type', 'pet_type_display', 'owner_uuid', 'name', 'age', 'sex', 'height', 'uploaded_photos',
+            'weight', 'breed_name', 'diet_type', 'diet_pattern', 'warning_tags', 'specific_features', 'additional_info',
+            'photo_ids', 'diet_additional_info', 'photos', 'dt_created', 'dt_updated')
         read_only_fields = ('id', 'dt_created', 'dt_updated')

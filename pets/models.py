@@ -1,10 +1,8 @@
-from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.db import models
 
-from pets.constants import PetType
+from pets.constants import PetType, PetSexType
 from pets.storages import pet_photo_upload_path
-from utils.file_type import IMAGE_EXTENSIONS
 from utils.mixins import AutoDateMixin
 
 
@@ -26,6 +24,7 @@ class Pet(AutoDateMixin):
     )
     name = models.CharField(verbose_name='Имя питомца', max_length=100)
     age = models.IntegerField(verbose_name='Возраст', validators=[MinValueValidator(1), MaxValueValidator(100)])
+    sex = models.CharField(verbose_name='Пол', choices=PetSexType.choices, max_length=10, default=PetSexType.MALE)
     height = models.IntegerField(verbose_name='Рост, см', validators=[MinValueValidator(1), MaxValueValidator(500)], null=True, blank=True)
     weight = models.IntegerField(verbose_name='Вес, кг', validators=[MinValueValidator(1), MaxValueValidator(300)], null=True, blank=True)
     breed_name = models.CharField(verbose_name='Название породы', max_length=100, blank=True, default='')
@@ -34,6 +33,7 @@ class Pet(AutoDateMixin):
     diet_additional_info = models.CharField(verbose_name='Доп. Информация по питанию', max_length=200, blank=True)
     warning_tags = models.JSONField(verbose_name='Важные предупреждения', blank=True, default=list)
     specific_features = models.JSONField(verbose_name='Особенности', blank=True, default=list)
+    additional_info = models.TextField('Дополнительная иформация', max_length=1000, blank=True)
 
     class Meta:
         verbose_name = 'Питомец'

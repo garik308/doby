@@ -8,3 +8,8 @@ class PetType(models.TextChoices):
     PARROT = 'parrot', 'Попугай'
     HAMSTER = 'hamster', 'Хомяк'
     OTHER = 'other', 'Другое'
+
+
+class PetSexType(models.TextChoices):
+    MALE = 'male', 'Мальчик'
+    FEMALE = 'female', 'Девочка'
