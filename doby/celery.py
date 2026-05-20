@@ -5,8 +5,11 @@ import os
 from celery import Celery
 from celery.schedules import crontab
 
+from doby.env_interface import Env
+
 # Устанавливаем переменную окружения Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'doby.settings')
+settings_module = 'doby.settings_prod' if Env.get_bool('DEBUG') else "doby.settings"
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings_module)
 
 # Создаем приложение Celery
 app = Celery('doby')

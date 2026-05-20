@@ -30,5 +30,6 @@ RUN poetry config virtualenvs.create false \
 # Копируем весь проект
 COPY . .
 
-# Команда по умолчанию (collectstatic теперь запускается через docker-compose command)
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "doby.asgi:application"]
+
+# Команда по умолчанию
+CMD ["python -m gunicorn doby.asgi.application -k uvicorn.workers.UvicornWorker"]

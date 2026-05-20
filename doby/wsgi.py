@@ -11,6 +11,9 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "doby.settings")
+from doby.env_interface import Env
+
+settings_module = 'doby.settings_prod' if Env.get_bool('DEBUG') else "doby.settings"
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings_module)
 
 application = get_wsgi_application()

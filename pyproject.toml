@@ -2,7 +2,7 @@
 name = "doby"
 version = "0.1.0"
 description = "Doby"
-authors = ["Your Name <you@example.com>"]
+authors = ["garibov"]
 package-mode = false
 
 [tool.poetry.dependencies]
@@ -27,6 +27,9 @@ libmagic = "^1.0"
 python-magic = "^0.4.27"
 django-celery-beat = "^2.9.0"
 django-cleanup = "^9.0.0"
+whitenoise = "^6.12.0"
+gunicorn = "^26.0.0"
+uvicorn = "^0.46.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.0"

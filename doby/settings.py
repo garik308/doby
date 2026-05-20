@@ -15,35 +15,10 @@ from pathlib import Path
 
 from celery.schedules import crontab
 
+from doby.env_interface import Env
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-class Env:
-    @staticmethod
-    def get_bool(variable_name, default=False):
-        variable = os.environ.get(variable_name, None)
-        if variable is None:
-            return default
-        return variable.lower() == 'true'
-
-    @staticmethod
-    def get_str(variable_name, default=''):
-        variable = os.environ.get(variable_name, None)
-        if variable is None:
-            return default
-        return variable
-
-    @staticmethod
-    def get_list(variable_name, default=None):
-        if default is None:
-            default = []
-
-        variable = os.environ.get(variable_name, None)
-        if not variable:
-            return default
-
-        return [item.strip() for item in variable.split(',') if item.strip()]
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -54,7 +29,7 @@ SECRET_KEY = Env.get_str('DJANGO_SECRET_KEY', 'django-insecure-default-dev-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = Env.get_bool('DEBUG', False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = Env.get_list('ALLOWED_HOSTS')
 if DEBUG:
     ALLOWED_HOSTS = ['doby.ru', 'localhost', '127.0.0.1', '0.0.0.0']
 
@@ -86,6 +61,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -93,6 +69,15 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 ROOT_URLCONF = "doby.urls"
 

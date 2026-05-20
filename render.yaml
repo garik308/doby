@@ -1,12 +1,10 @@
-version: "1.0"
-
 services:
   - type: web
     name: doby-web
     repo: https://github.com/garik308/doby
     branch: master
     dockerfilePath: ./Dockerfile
-    preDeployCommand: "python manage.py migrate --noinput && python manage.py collectstatic --noinput"
+    buildCommand: ./build.sh
     envVars:
       - key: DJANGO_SECRET_KEY
         sync: false
