@@ -5,7 +5,7 @@ from users.views import (
     MeUpdateAPIView,
     CitiesRetrieveAPIView,
     DeleteUserProfileView,
-    UserPhotoCreateView, UserPhotoDeleteView,
+    UserPhotoCreateView, UserPhotoDeleteView, UserRetrieveAPIView,
 )
 
 urlpatterns = [
@@ -15,4 +15,5 @@ urlpatterns = [
     path('me/delete/', DeleteUserProfileView.as_view(), name='delete-user'),
     path('me/photos/', UserPhotoCreateView.as_view(), name='photos-create'),
     path('me/photos/<int:photo_id>/', UserPhotoDeleteView.as_view(), name='user-photo-delete'),
+    path('<uuid:user_uuid>/', UserRetrieveAPIView.as_view(), name='user-photo-delete'),
 ]

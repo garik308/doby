@@ -2,6 +2,7 @@ from django.db import transaction
 from django.db.models import Max
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
@@ -9,7 +10,7 @@ from rest_framework.views import APIView
 
 from bookings.models import Booking
 from pets.models import Pet
-from users.models import City, DeletedUser, UserPhoto
+from users.models import City, DeletedUser, UserPhoto, User
 from users.serializers import CitySerializer, UserUpdateSerializer, UserRetieveSerializer, UserBaseSerializer, \
     UserForDeleteSerializer, UserPhotoSerializer
 
@@ -163,3 +164,26 @@ class UserPhotoDeleteView(APIView):
             self.output_serializer(request.user.photos.all(), many=True).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+class UserRetrieveAPIView(APIView):
+    """Получить Данные пользователя по uuid"""
+
+    permission_classes = ()
+    output_serializer = UserRetieveSerializer
+
+    @extend_schema(
+        summary=__doc__,
+        request=None,
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(response=output_serializer),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(response=None, description='Учетные данные не были предоставлены'),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(response=None, description='Пользователь не найден'),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: OpenApiResponse(response=None, description='Ошибка на стороне сервера'),
+        },
+    )
+    def get(self, request, user_uuid):
+        """Получить данные текущего пользователя"""
+        user = get_object_or_404(User, uuid=user_uuid)
+        serializer = self.output_serializer(instance=user)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)

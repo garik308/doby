@@ -1,5 +1,6 @@
 import logging
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, Max
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
@@ -197,3 +198,23 @@ class PetPhotoCreateView(APIView):
 
         output_serializer = PetPhotoSerializer(pet.photos.all(), many=True)
         return Response(output_serializer.data, status=status.HTTP_201_CREATED)
+
+
+class PetPhotoDeleteView(APIView):
+
+    @extend_schema(
+        summary='Удалить фото питомца',
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                response=None, description='Не найдено фото/фото пренадлежит чужому питомцу'
+            ),
+            status.HTTP_200_OK: OpenApiResponse(response=None, description='Фото успешно удалено'),
+        },
+    )
+    def delete(self, request, photo_id):
+        """Удалить фото питомца"""
+        try:
+            PetPhoto.objects.get(id=photo_id, pet__owner=request.user).delete()
+        except ObjectDoesNotExist:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_200_OK)
