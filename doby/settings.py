@@ -28,6 +28,7 @@ SECRET_KEY = Env.get_str('DJANGO_SECRET_KEY', 'django-insecure-default-dev-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = Env.get_bool('DEBUG', False)
+print(DEBUG)
 
 ALLOWED_HOSTS = Env.get_list('ALLOWED_HOSTS')
 if DEBUG:
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     'chats',
     'bookings',
     'pets',
+    'reviews',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
@@ -84,7 +86,7 @@ ROOT_URLCONF = "doby.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -222,3 +224,11 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour=3, minute=0),  # каждый день в 3:00
     },
 }
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = Env.get_str('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = Env.get_str('EMAIL_HOST_PASSWORD')

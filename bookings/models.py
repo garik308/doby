@@ -1,8 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.conf import settings
 
 from bookings.constants import BookingStatus
+from sitters.models import ServiceTypeChoices
 from utils.mixins import AutoDateMixin
 
 
@@ -18,7 +18,7 @@ class Booking(AutoDateMixin):
         blank=True,
     )
     sitter = models.ForeignKey(
-        'users.User',
+        'sitters.SitterProfile',
         on_delete=models.SET_NULL,
         related_name='sitter_bookings',
         verbose_name='Ситтер',
@@ -31,6 +31,7 @@ class Booking(AutoDateMixin):
         verbose_name='Питомец',
         null=True,
     )
+    service = models.CharField(verbose_name='Тип услуги', choices=ServiceTypeChoices.choices, default=ServiceTypeChoices.BOARDING)
     start_datetime = models.DateTimeField(verbose_name='Начало')
     end_datetime = models.DateTimeField(verbose_name='Конец')
     status = models.CharField(
@@ -42,6 +43,10 @@ class Booking(AutoDateMixin):
     comment = models.TextField(
         blank=True,
         verbose_name='Комментарий к заказу'
+    )
+    cancelled_at = models.DateTimeField(
+        null=True, blank=True,
+        verbose_name='Время отмены собачником'
     )
     sitter_confirmed_at = models.DateTimeField(
         null=True, blank=True,

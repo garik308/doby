@@ -7,7 +7,7 @@ import sys
 def main():
     """Run administrative tasks."""
     from doby.env_interface import Env
-    settings_module = 'doby.settings_prod' if Env.get_bool('DEBUG') else "doby.settings"
+    settings_module = 'doby.settings_prod' if not Env.get_bool('DEBUG') else "doby.settings"
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings_module)
     try:
         from django.core.management import execute_from_command_line

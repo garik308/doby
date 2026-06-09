@@ -50,10 +50,18 @@ class MeUpdateAPIView(APIView):
     )
     def patch(self, request):
         """Частично обновить данные текущего пользователя"""
+        old_data = self.output_serializer(request.user).data
         serializer = UserUpdateSerializer(instance=request.user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(data=self.output_serializer(instance=request.user).data, status=status.HTTP_200_OK)
+        user = serializer.instance
+        new_data = self.output_serializer(user).data
+
+        changed_fields = {
+            new_data_key: new_data[new_data_key] for new_data_key in request.data.keys()
+            if new_data_key in new_data and old_data.get(new_data_key) != new_data.get(new_data_key)
+        }
+        return Response(data=changed_fields, status=status.HTTP_200_OK)
 
 
 class CitiesRetrieveAPIView(APIView):
@@ -133,15 +141,14 @@ class UserPhotoCreateView(APIView):
         serializer.is_valid(raise_exception=True)
 
         max_order = request.user.photos.aggregate(Max('order_number'))['order_number__max'] or 0
-        UserPhoto.objects.create(
+        new_photo = UserPhoto.objects.create(
             user=request.user,
             image=serializer.validated_data['image'],
             order_number=max_order + 1,
             is_main=False,
         )
 
-        output_serializer = self.output_serializer(request.user.photos.all(), many=True)
-        return Response(output_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(self.output_serializer(new_photo).data, status=status.HTTP_201_CREATED)
 
 
 class UserPhotoDeleteView(APIView):

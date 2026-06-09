@@ -2,8 +2,25 @@ import uuid
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import F, Value, DecimalField
+from django.db.models.functions import Radians, Cos, Sin, ACos
 
+from bookings.constants import ServiceTypeChoices
 from utils.mixins import AutoDateMixin
+
+EARTH_RADIUS = 6371
+
+
+class SitterProfileManager(models.Manager):
+    def get_nearby_sitters(self, lat, lng, radius_km=10):
+        lat_rad = Radians(Value(lat))
+        lng_rad = Radians(Value(lng))
+        distance = (EARTH_RADIUS * ACos(
+            Cos(lat_rad) * Cos(Radians(F('location_lat'))) *
+            Cos(Radians(F('location_lng')) - lng_rad) +
+            Sin(lat_rad) * Sin(Radians(F('location_lat')))
+        ))
+        return self.annotate(distance=distance).filter(distance__lte=radius_km).order_by('distance')
 
 
 class SitterProfile(AutoDateMixin):
@@ -35,6 +52,12 @@ class SitterProfile(AutoDateMixin):
     )
     is_verified = models.BooleanField('Подтвержден', default=False)
     bio = models.CharField('Описание ситтера', blank=True, max_length=1500)
+    location_lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    location_lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    address = models.CharField(max_length=255, blank=True)
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.0)  # средний рейтинг
+
+    objects = SitterProfileManager()
 
     def __str__(self):
         return f"Sitter profile {self.id}"
@@ -43,3 +66,19 @@ class SitterProfile(AutoDateMixin):
         verbose_name = 'Профиль ситтера'
         verbose_name_plural = 'Профили ситтеров'
         indexes = [models.Index(fields=['dt_updated'], name='sitter_profile_dt_updated_idx')]
+
+
+
+
+class SitterService(AutoDateMixin):
+    sitter = models.ForeignKey(SitterProfile, on_delete=models.CASCADE)
+    service_type = models.CharField(max_length=20, choices=ServiceTypeChoices.choices)
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # своя цена, если отличается от базовой
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Сервис ситтера {self.service_type_id}"
+
+    class Meta:
+        verbose_name = 'Сервисы ситтера'
+        verbose_name_plural = 'Сервисы ситтеров'

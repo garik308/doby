@@ -99,6 +99,7 @@ class PetUpdateDeleteAPIView(APIView):
     def patch(self, request, pet_id):
         """Частично обновить данных питомца"""
         pet = get_object_or_404(Pet.objects.prefetch_related('owner'), id=pet_id, owner=request.user)
+        old_data = self.output_serializer(pet).data
         serializer = self.input_serializer(pet, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         uploaded_photos = serializer.validated_data.pop('uploaded_photos', [])
@@ -114,10 +115,14 @@ class PetUpdateDeleteAPIView(APIView):
                 is_main=(idx == 0),
             )
 
-        return Response(
-            data=self.output_serializer(Pet.objects.prefetch_related('photos').get(id=pet.id)).data,
-            status=status.HTTP_201_CREATED,
-        )
+        new_data = self.output_serializer(pet).data
+
+        changed_fields = {
+            key: new_data[key] for key in request.data.keys()
+            if old_data.get(key) != new_data.get(key)
+        }
+
+        return Response(data=changed_fields, status=status.HTTP_200_OK)
 
     @extend_schema(
         summary='Удалить питомца 😞',
@@ -189,15 +194,14 @@ class PetPhotoCreateView(APIView):
         pet = get_object_or_404(Pet, id=pet_id, owner=request.user)
         max_order = pet.photos.aggregate(Max('order_number'))['order_number__max'] or 0
 
-        PetPhoto.objects.create(
+        new_photo = PetPhoto.objects.create(
             pet=pet,
             image=serializer.validated_data['image'],
             order_number=max_order + 1,
             is_main=False,
         )
 
-        output_serializer = PetPhotoSerializer(pet.photos.all(), many=True)
-        return Response(output_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(PetPhotoSerializer(new_photo).data, status=status.HTTP_201_CREATED)
 
 
 class PetPhotoDeleteView(APIView):

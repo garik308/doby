@@ -8,6 +8,7 @@ from users.serializers import UserBaseSerializer
 
 class MessageSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
+    chat_id = serializers.IntegerField(read_only=True)
     sender_uuid = serializers.CharField(source='sender.uuid', read_only=True)
     text = serializers.CharField(label='Текст сообщения', allow_blank=True, max_length=4000)
     original_filename = serializers.CharField(label='Изначальное название файла', max_length=500, allow_blank=True)
@@ -30,3 +31,12 @@ class ChatRoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatRoom
         fields = ['id', 'booking', 'participants', 'messages', 'dt_created']
+
+
+class ChatRoomCreateSerializer(serializers.Serializer):
+    participants = serializers.ListField(
+        child=serializers.UUIDField(),
+        required=True,
+        help_text='Список UUID пользователей (текущий будет добавлен автоматически)'
+    )
+    booking_id = serializers.IntegerField(required=False, help_text='ID бронирования (опционально)')
