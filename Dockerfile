@@ -32,4 +32,4 @@ COPY . .
 
 
 # Команда по умолчанию
-CMD ["python -m gunicorn doby.asgi.application -k uvicorn.workers.UvicornWorker"]
+CMD ["sh", "-c", "python -m gunicorn doby.asgi.application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000"]

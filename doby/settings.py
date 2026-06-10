@@ -28,7 +28,6 @@ SECRET_KEY = Env.get_str('DJANGO_SECRET_KEY', 'django-insecure-default-dev-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = Env.get_bool('DEBUG', False)
-print(DEBUG)
 
 ALLOWED_HOSTS = Env.get_list('ALLOWED_HOSTS')
 if DEBUG:
