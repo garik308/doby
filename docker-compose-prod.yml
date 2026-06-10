@@ -78,6 +78,7 @@ services:
       - static_volume:/static:ro
       - media_volume:/media:ro
       - protected_media_volume:/protected:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - web
     restart: unless-stopped
