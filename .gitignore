@@ -82,6 +82,7 @@ target/
 local_settings.py
 
 .env
+.env*
 db.sqlite3
 .idea
 media/
