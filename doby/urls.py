@@ -1,9 +1,8 @@
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
-from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView
 
-from doby.views import health_check
+from doby.views import health_check, AdminProtectedSpectacularAPIView, AdminProtectedSpectacularSwaggerView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,10 +12,6 @@ urlpatterns = [
     path('api/chat/', include('chats.urls')),
     path('api/pets/', include('pets.urls')),
     path('health/', health_check),
+    path('api/schema/', AdminProtectedSpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', AdminProtectedSpectacularSwaggerView.as_view(url_name='schema'), name='docs'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += [
-        path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-        path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='docs'),
-    ]
