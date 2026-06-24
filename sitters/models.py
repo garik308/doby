@@ -71,7 +71,7 @@ class SitterProfile(AutoDateMixin):
 
 
 class SitterService(AutoDateMixin):
-    sitter = models.ForeignKey(SitterProfile, on_delete=models.CASCADE)
+    sitter = models.ForeignKey(SitterProfile, on_delete=models.CASCADE, related_name='services')
     service_type = models.CharField(max_length=20, choices=ServiceTypeChoices.choices)
     price = models.DecimalField(max_digits=10, decimal_places=2)  # своя цена, если отличается от базовой
     is_active = models.BooleanField(default=True)

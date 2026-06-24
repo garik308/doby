@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 
@@ -8,6 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('authentication.urls')),
     path('api/users/', include('users.urls')),
+    path('api/bookings/', include('bookings.urls')),
     path('api/sitters/', include('sitters.urls')),
     path('api/chat/', include('chats.urls')),
     path('api/pets/', include('pets.urls')),

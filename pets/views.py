@@ -34,7 +34,7 @@ class PetCreateAPIView(APIView):
         uploaded_photos = serializer.validated_data.pop('uploaded_photos', [])
         pet = serializer.save(owner=request.user)
 
-        for idx, photo_file in enumerate(uploaded_photos, start=1):
+        for idx, photo_file in enumerate(uploaded_photos):
             PetPhoto.objects.create(
                 pet=pet,
                 image=photo_file,
@@ -209,7 +209,7 @@ class PetPhotoDeleteView(APIView):
     @extend_schema(
         summary='Удалить фото питомца',
         responses={
-            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
                 response=None, description='Не найдено фото/фото пренадлежит чужому питомцу'
             ),
             status.HTTP_200_OK: OpenApiResponse(response=None, description='Фото успешно удалено'),
@@ -217,8 +217,6 @@ class PetPhotoDeleteView(APIView):
     )
     def delete(self, request, photo_id):
         """Удалить фото питомца"""
-        try:
-            PetPhoto.objects.get(id=photo_id, pet__owner=request.user).delete()
-        except ObjectDoesNotExist:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        photo = get_object_or_404(PetPhoto, id=photo_id, pet__owner=request.user)
+        photo.delete()
         return Response(status=status.HTTP_200_OK)
