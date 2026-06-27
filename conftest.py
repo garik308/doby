@@ -12,11 +12,13 @@ def api_client():
 def user_owner():
     return UserFactory()
 
+
 @pytest.fixture
 def user_sitter():
     user = UserFactory()
     SitterProfileFactory(user=user)
     return user
+
 
 @pytest.fixture
 def pet(user_owner):

@@ -1,3 +1,5 @@
+import uuid
+
 import factory
 from factory.django import DjangoModelFactory
 from django.contrib.auth import get_user_model
@@ -21,6 +23,7 @@ class SitterProfileFactory(DjangoModelFactory):
     class Meta:
         model = 'sitters.SitterProfile'
 
+    uuid = factory.LazyFunction(lambda: uuid.uuid4())
     user = factory.SubFactory(UserFactory)
     location_lat = factory.LazyAttribute(lambda _: fake.latitude())
     location_lng = factory.LazyAttribute(lambda _: fake.longitude())

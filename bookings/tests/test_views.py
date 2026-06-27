@@ -12,7 +12,7 @@ class TestBookingCreate:
     def test_create_success(self, auth_client, user_sitter, pet):
         url = reverse('booking-create')
         data = {
-            'sitter_id': user_sitter.sitter_id,
+            'sitter_uuid': user_sitter.sitter_profile.uuid,
             'pet_id': pet.id,
             'service': 'walking',
             'start_datetime': '2025-06-01T10:00:00Z',
@@ -28,7 +28,7 @@ class TestBookingCreate:
         booking = BookingFactory(sitter=user_sitter, pet=pet)
         url = reverse('booking-create')
         data = {
-            'sitter_id': user_sitter.id,
+            'sitter_uuid': user_sitter.sitter_profile.uuid,
             'pet_id': pet.id,
             'service': 'walking',
             'start_datetime': booking.start_datetime.isoformat(),
@@ -48,7 +48,7 @@ class TestBookingLists:
         assert len(response.data) == 1
 
     def test_sitter_bookings(self, sitter_auth_client, user_sitter):
-        booking = BookingFactory(sitter=user_sitter)
+        booking = BookingFactory(sitter=user_sitter.sitter_profile)
         url = reverse('sitter-bookings')
         response = sitter_auth_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -57,7 +57,7 @@ class TestBookingLists:
 
 class TestBookingActions:
     def test_accept_booking(self, sitter_auth_client, user_sitter):
-        booking = BookingFactory(sitter=user_sitter)
+        booking = BookingFactory(sitter=user_sitter.sitter_profile)
         url = reverse('booking-actions', args=[booking.id])
         data = {'action': 'accept'}
         response = sitter_auth_client.post(url, data)

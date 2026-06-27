@@ -2,7 +2,7 @@ import factory
 from factory.django import DjangoModelFactory
 from bookings.models import Booking
 from reviews.models import Review
-from tests.factories import UserFactory, PetFactory
+from tests.factories import UserFactory, PetFactory, SitterProfileFactory
 import random
 from django.utils import timezone
 from datetime import timedelta
@@ -12,7 +12,7 @@ class BookingFactory(DjangoModelFactory):
         model = Booking
 
     owner = factory.SubFactory(UserFactory)
-    sitter = factory.SubFactory(UserFactory)
+    sitter = factory.SubFactory(SitterProfileFactory)
     pet = factory.SubFactory(PetFactory)
     service = 'walking'
     start_datetime = factory.LazyFunction(lambda: timezone.now() + timedelta(days=1))
