@@ -58,7 +58,8 @@ class SitterListOutputSerializer(serializers.ModelSerializer):
         fields = ('uuid', 'username', 'avatar', 'rating', 'distance', 'min_price', 'bio', 'location_lat', 'location_lng')
 
     def get_avatar(self, obj):
-        return obj.user.avatar.url if obj.user.avatar else None
+        avatar = obj.user.photos.first()
+        return avatar.url if avatar else None
 
     def get_min_price(self, obj):
         min_price = obj.services.filter(is_active=True).aggregate(models.Min('price'))['price__min']

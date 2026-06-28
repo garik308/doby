@@ -2,7 +2,8 @@ import uuid
 
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import F, Value, DecimalField
+from django.db.models import F, Value, DecimalField, FloatField
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import Radians, Cos, Sin, ACos
 
 from bookings.constants import ServiceTypeChoices
@@ -11,15 +12,19 @@ from utils.mixins import AutoDateMixin
 EARTH_RADIUS = 6371
 
 
-class SitterProfileManager(models.Manager):
+class SitterProfileQuerySet(models.QuerySet):
     def get_nearby_sitters(self, lat, lng, radius_km=10):
-        lat_rad = Radians(Value(lat))
-        lng_rad = Radians(Value(lng))
-        distance = (EARTH_RADIUS * ACos(
-            Cos(lat_rad) * Cos(Radians(F('location_lat'))) *
-            Cos(Radians(F('location_lng')) - lng_rad) +
-            Sin(lat_rad) * Sin(Radians(F('location_lat')))
-        ))
+        distance = RawSQL(
+            """
+            %s * ACOS(
+                COS(RADIANS(%s)) * COS(RADIANS(location_lat)) * 
+                COS(RADIANS(location_lng) - RADIANS(%s)) + 
+                SIN(RADIANS(%s)) * SIN(RADIANS(location_lat))
+            )
+            """,
+            [EARTH_RADIUS, lat, lng, lat],
+            output_field=models.FloatField()
+        )
         return self.annotate(distance=distance).filter(distance__lte=radius_km).order_by('distance')
 
 
@@ -57,7 +62,7 @@ class SitterProfile(AutoDateMixin):
     address = models.CharField(max_length=255, blank=True)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.0)  # средний рейтинг
 
-    objects = SitterProfileManager()
+    objects = SitterProfileQuerySet.as_manager()
 
     def __str__(self):
         return f"Sitter profile {self.uuid}"

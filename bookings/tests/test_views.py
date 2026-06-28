@@ -25,7 +25,7 @@ class TestBookingCreate:
         assert len(mail.outbox) == 1
 
     def test_create_overlapping(self, auth_client, user_sitter, pet):
-        booking = BookingFactory(sitter=user_sitter, pet=pet)
+        booking = BookingFactory(sitter=user_sitter.sitter_profile, pet=pet)
         url = reverse('booking-create')
         data = {
             'sitter_uuid': user_sitter.sitter_profile.uuid,
@@ -36,7 +36,7 @@ class TestBookingCreate:
         }
         response = auth_client.post(url, data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'Sitter already booked' in str(response.data)
+        assert "{'error': 'Ситтер занят в это время, попробуйте другое'}" in str(response.data)
 
 
 class TestBookingLists:
@@ -68,7 +68,7 @@ class TestBookingActions:
 
     def test_cancel_booking(self, auth_client, user_owner):
         booking = BookingFactory(owner=user_owner)
-        url = reverse('booking-actions', args=[booking.id])
+        url = reverse('user-booking-cancel', args=[booking.id])
         data = {'action': 'cancel'}
         response = auth_client.post(url, data)
         booking.refresh_from_db()

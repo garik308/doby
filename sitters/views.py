@@ -51,7 +51,7 @@ class SitterNearbyView(APIView):
             user__is_active=True
         )
 
-        if data['service']:
+        if data.get('service'):
             qs = qs.filter(services__service_type=data['service'], services__is_active=True)
 
         qs = qs.get_nearby_sitters(data['lat'], data['lng'], radius_km=(data['radius_km']))

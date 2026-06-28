@@ -1,6 +1,7 @@
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from django.db.models import Q, Max
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
@@ -72,7 +73,7 @@ class PetUpdateDeleteAPIView(APIView):
         serializer = self.input_serializer(pet, data=request.data, partial=False)
         serializer.is_valid(raise_exception=True)
         uploaded_photos = serializer.validated_data.pop('uploaded_photos', [])
-        photo_ids = serializer.validated_data.pop('photo_ids')
+        photo_ids = serializer.validated_data.pop('photo_ids', [])
         serializer.save()
         PetPhoto.objects.filter(~Q(id__in=photo_ids) & Q(pet=pet)).delete()
         for idx, photo_file in enumerate(uploaded_photos, start=1):
@@ -85,7 +86,7 @@ class PetUpdateDeleteAPIView(APIView):
 
         return Response(
             data=self.output_serializer(Pet.objects.prefetch_related('photos').get(id=pet.id)).data,
-            status=status.HTTP_201_CREATED,
+            status=status.HTTP_200_OK,
         )
 
     @extend_schema(
@@ -193,13 +194,16 @@ class PetPhotoCreateView(APIView):
 
         pet = get_object_or_404(Pet, id=pet_id, owner=request.user)
         max_order = pet.photos.aggregate(Max('order_number'))['order_number__max'] or 0
+        with transaction.atomic():
+            if serializer.validated_data['is_main']:
+                PetPhoto.objects.filter(is_main=True).update(is_main=False)
 
-        new_photo = PetPhoto.objects.create(
-            pet=pet,
-            image=serializer.validated_data['image'],
-            order_number=max_order + 1,
-            is_main=False,
-        )
+            new_photo = PetPhoto.objects.create(
+                pet=pet,
+                image=serializer.validated_data['image'],
+                order_number=max_order + 1,
+                is_main=serializer.validated_data['is_main'],
+            )
 
         return Response(PetPhotoSerializer(new_photo).data, status=status.HTTP_201_CREATED)
 

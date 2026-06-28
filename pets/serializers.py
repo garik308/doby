@@ -41,7 +41,7 @@ class PetSerializer(serializers.ModelSerializer):
 
 class PetUpdateSerializer(PetSerializer):
     """Сериализатор питомца для обновления"""
-    photo_ids = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    photo_ids = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
 
     class Meta:
         model = Pet

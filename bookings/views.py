@@ -110,7 +110,7 @@ class SitterBookingActionView(APIView):
         action_serializer = BookingActionSerializer(data=request.data)
         action_serializer.is_valid(raise_exception=True)
         action = action_serializer.validated_data['action']
-        booking = get_object_or_404(Booking, pk=booking_id, sitter=request.user)
+        booking = get_object_or_404(Booking, pk=booking_id, sitter=request.user.sitter_profile)
 
         if action == 'accept':
             if booking.status != BookingStatus.PENDING:
@@ -160,8 +160,8 @@ class SitterBookingActionView(APIView):
 class BookingCancelView(APIView):
 
     @extend_schema(responses={200: BookingOutputSerializer, 400: "Нельзя отменить"})
-    def post(self, request, pk):
-        booking = get_object_or_404(Booking, pk=pk, owner=request.user)
+    def post(self, request, booking_id):
+        booking = get_object_or_404(Booking, pk=booking_id, owner=request.user)
         if booking.status not in [BookingStatus.PENDING, BookingStatus.CONFIRMED]:
             return Response({'error': 'Нельзя отменить, если ситтер принял заказ или выполнил его'}, status=400)
         booking.status = BookingStatus.CANCELLED_BY_OWNER
