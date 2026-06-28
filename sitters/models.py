@@ -60,7 +60,7 @@ class SitterProfile(AutoDateMixin):
     objects = SitterProfileManager()
 
     def __str__(self):
-        return f"Sitter profile {self.id}"
+        return f"Sitter profile {self.uuid}"
 
     class Meta:
         verbose_name = 'Профиль ситтера'

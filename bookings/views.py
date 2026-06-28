@@ -30,7 +30,7 @@ class BookingCreateView(APIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
-        sitter = get_object_or_404(SitterProfile, uuid=data['sitter_uuid'], user__is_active=True)
+        sitter = get_object_or_404(SitterProfile.objects.select_related('user'), uuid=data['sitter_uuid'], user__is_active=True)
         overlapping = Booking.objects.filter(
             sitter=sitter,
             start_datetime__lt=data['end_datetime'],
@@ -56,7 +56,7 @@ class BookingCreateView(APIView):
             subject='Новый запрос на бронирование',
             message=f'Пользователь {request.user.full_name} хочет забронировать услугу {booking.service} с {booking.start_datetime} по {booking.end_datetime}. Перейдите в приложение для подтверждения.',
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[sitter.username],
+            recipient_list=[sitter.user.username],
             fail_silently=True,
         )
 

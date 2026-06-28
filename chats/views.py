@@ -39,6 +39,25 @@ class ChatRoomCreateView(APIView):
     output_serializer = ChatRoomSerializer
 
     @extend_schema(
+        summary='Получить все чаты',
+        description=(
+                'Возвращает все чаты пользователя'
+        ),
+        responses={
+            200: output_serializer,
+            400: OpenApiResponse(description='Ошибка валидации'),
+        }
+    )
+    def get(self, request):
+        user_chatrooms = ChatRoom.objects.filter(
+            id__in=(
+                ChatRoom.participants.through.objects.filter(user=self.request.user)
+                .values_list('chatroom_id', flat=True)
+            ),
+        )
+        return Response(self.output_serializer(user_chatrooms, many=True).data)
+
+    @extend_schema(
         summary='Создать чат',
         description=(
             'Создаёт новый чат. Текущий пользователь добавляется автоматически. '

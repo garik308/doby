@@ -10,4 +10,4 @@ def create_chat_for_booking(sender, instance, created, **kwargs):
         chat, chat_created = ChatRoom.objects.get_or_create(booking=instance)
         if chat_created:
             # Добавляем участников (owner и sitter)
-            chat.participants.add(instance.owner, instance.sitter)
+            chat.participants.add(instance.owner, instance.sitter.user)

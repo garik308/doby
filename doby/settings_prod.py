@@ -3,7 +3,15 @@ from doby.settings import *
 SECRET_KEY = Env.get_str('DJANGO_SECRET_KEY')
 DEBUG = False
 ALLOWED_HOSTS = Env.get_list('ALLOWED_HOSTS')
+
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = Env.get_str('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = Env.get_str('EMAIL_HOST_PASSWORD')
